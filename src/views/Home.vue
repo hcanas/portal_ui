@@ -17,6 +17,7 @@
       <div class="flex-grow">
         <ag-grid-vue v-if="announcements.length > 0"
         @grid-ready="gridReady"
+        @cell-clicked="cellClicked"
         :columnDefs="column_defs"
         :rowData="announcements"
         :rowSelection="'single'"
@@ -39,7 +40,7 @@
   </div>
 
   <modal :show="modal.show">
-    <announcement-form @close="closeModal" :data="modal.data"></announcement-form>
+    <component :is="modal.component" @close="closeModal" @created-announcement="createdAnnouncement" @updated-announcement="updatedAnnouncement" :data="modal.data"></component>
   </modal>
 </template>
 <script>
@@ -49,10 +50,12 @@
 
   import Modal from "../components/overlays/Modal.vue";
   import AnnouncementForm from "../components/forms/AnnouncementForm.vue";
+  import SuccessMessage from "../components/messages/SuccessMessage.vue";
 
   export default {
     name: 'Home',
     components: {
+      SuccessMessage,
       AgGridVue,
       AnnouncementForm,
       Modal,
@@ -62,6 +65,7 @@
         modal: {
           show: false,
           title: '',
+          component: '',
           data: {},
         },
         grid_api: null,
@@ -109,7 +113,9 @@
             cellRenderer: params => {
               let data = params.data.details;
 
-              data += `<a href="${import.meta.env.VITE_API_URL}/announcements/${params.data.attachment}" class="text-small text-green-600 hover:text-green-500 focus:text-green-500 mx-2" title="View Attachment" target="_blank"><span class="fas fa-file-alt"></span></a>`;
+              if (params.data.attachment) {
+                data += `<a href="${import.meta.env.VITE_API_URL}/storage/announcements/${params.data.attachment}" class="text-small text-green-600 hover:text-green-500 focus:text-green-500 mx-2" title="View Attachment" target="_blank"><span class="fas fa-file-alt"></span></a>`;
+              }
 
               return data;
             },
@@ -127,26 +133,51 @@
       gridReady(params) {
         this.grid_api = params.api;
       },
+      cellClicked(params) {
+        if (params.event.target.dataset.action) {
+          switch (params.event.target.dataset.action) {
+            case 'edit-announcement':
+              this.modal.show = true;
+              this.modal.component = 'announcement-form';
+              this.modal.data = {
+                ...params.data,
+                attachment_action: 'keep',
+                new_attachment: null,
+              };
+              break;
+          }
+        }
+      },
       getRowNodeId(data) {
         return data.id;
       },
-      showModal(id) {
-        if (id) {
-
-        } else {
+      showModal() {
           this.modal.show = true;
           this.modal.title = 'New Announcement';
+          this.modal.component = 'announcement-form';
           this.modal.data = {
             title: '',
             details: '',
             attachment: '',
           };
-        }
       },
       closeModal() {
         this.modal.show = false;
         this.modal.title = '';
         this.modal.data = {};
+      },
+      createdAnnouncement(announcement) {
+        this.grid_api.applyTransaction({
+          add: [announcement],
+          addIndex: 0,
+        });
+        this.modal.component = 'success-message';
+        this.modal.data = { message: 'Announcement has been created.' };
+      },
+      updatedAnnouncement(announcement) {
+        this.grid_api.applyTransaction({ update: [announcement] });
+        this.modal.component = 'success-message';
+        this.modal.data = { message: 'Announcement has been updated.' };
       },
     },
     watch: {
