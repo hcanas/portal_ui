@@ -137,7 +137,7 @@
               sortable: true,
               resizable: true,
               flex: 1,
-              valueGetter: params => params.data.name,
+              valueFormatter: params => `${params.data.name} (${params.data.short_name})`,
             },
           ],
           row_data: [],
