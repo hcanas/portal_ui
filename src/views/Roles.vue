@@ -21,7 +21,15 @@
   </ag-grid-vue>
 
   <modal :show="modal.show" @close="closeModal">
-    <component @created-role="createdRole" @updated-role="updatedRole" @updated-permissions="updatedPermissions" @close="closeModal" @cancel="closeModal" :data="modal.data" :is="modal.component"></component>
+    <component
+    @created-role="createdRole"
+    @updated-role="updatedRole"
+    @updated-permissions="updatedPermissions"
+    @confirm="deleteRole"
+    @close="closeModal"
+    :data="modal.data"
+    :is="modal.component">
+    </component>
   </modal>
 </template>
 <script>
@@ -32,10 +40,12 @@
   import RoleForm from "../components/forms/RoleForm.vue";
   import RolePermissionForm from "../components/forms/RolePermissionForm.vue";
   import SuccessMessage from "../components/messages/SuccessMessage.vue";
+  import DeleteDialog from "../components/messages/DeleteDialog.vue";
 
   export default {
     name: 'Roles',
     components: {
+      DeleteDialog,
       AgGridVue,
       Modal,
       RoleForm,
@@ -153,6 +163,12 @@
               this.modal.component = 'role-permission-form';
               this.modal.data = params.data;
               break;
+
+            case 'delete-role':
+              this.modal.show = true;
+              this.modal.component = 'delete-dialog';
+              this.modal.data = { message: `You are about to delete the role "${params.data.name}".` };
+              break;
           }
         }
       },
@@ -186,6 +202,16 @@
         this.grid_api.applyTransaction({ update: [role] })
         this.modal.component = 'success-message';
         this.modal.data = { message: `${role.name} permissions have been updated.`}
+      },
+      deleteRole() {
+        const data = this.grid_api.getSelectedRows()[0];
+
+        this.axios.delete(`${import.meta.env.VITE_API_URL}/api/roles/${data.id}`)
+        .then(() => {
+          this.grid_api.applyTransaction({ remove: [{ id: data.id }] });
+          this.modal.component = 'success-message';
+          this.modal.data = { message: `${data.name} has been deleted.` };
+        });
       },
     },
     watch: {

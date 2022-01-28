@@ -17,7 +17,7 @@
           <p class="text-gray-600 animate-pulse">Saving Role Information</p>
         </div>
         <div v-else class="flex justify-end items-center space-x-4">
-          <button type="button" @click="$emit('cancel')" class="w-40 bg-gray-200 hover:bg-gray-100 px-4 py-1 rounded">Cancel</button>
+          <button type="button" @click="$emit('close')" class="w-40 bg-gray-200 hover:bg-gray-100 px-4 py-1 rounded">Cancel</button>
           <button type="button" @click="saveRole" class="w-40 text-white bg-green-600 hover:bg-green-500 px-4 py-1 rounded">Save</button>
         </div>
       </div>
