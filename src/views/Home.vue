@@ -40,7 +40,15 @@
   </div>
 
   <modal :show="modal.show">
-    <component :is="modal.component" @close="closeModal" @created-announcement="createdAnnouncement" @updated-announcement="updatedAnnouncement" :data="modal.data"></component>
+    <component
+    :is="modal.component"
+    @close="closeModal"
+    @created-announcement="createdAnnouncement"
+    @updated-announcement="updatedAnnouncement"
+    @confirm="deleteAnnouncement"
+    :data="modal.data"
+    >
+    </component>
   </modal>
 </template>
 <script>
@@ -51,10 +59,12 @@
   import Modal from "../components/overlays/Modal.vue";
   import AnnouncementForm from "../components/forms/AnnouncementForm.vue";
   import SuccessMessage from "../components/messages/SuccessMessage.vue";
+  import DeleteDialog from "../components/messages/DeleteDialog.vue";
 
   export default {
     name: 'Home',
     components: {
+      DeleteDialog,
       SuccessMessage,
       AgGridVue,
       AnnouncementForm,
@@ -145,6 +155,11 @@
                 new_attachment: null,
               };
               break;
+
+            case 'delete-announcement':
+              this.modal.show = true;
+              this.modal.component = 'delete-dialog';
+              this.modal.data = { message: `You are about to delete an announcement "${params.data.title}"` };
           }
         }
       },
@@ -178,6 +193,16 @@
         this.grid_api.applyTransaction({ update: [announcement] });
         this.modal.component = 'success-message';
         this.modal.data = { message: 'Announcement has been updated.' };
+      },
+      deleteAnnouncement() {
+        const data = this.grid_api.getSelectedRows()[0];
+
+        this.axios.delete(`${import.meta.env.VITE_API_URL}/api/announcements/${data.id}`)
+        .then(() => {
+          this.grid_api.applyTransaction({ remove: [{ id: data.id }]});
+          this.modal.component = 'success-message';
+          this.modal.data = { message: `${data.title} has been deleted.` };
+        });
       },
     },
     watch: {
