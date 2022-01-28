@@ -25,7 +25,14 @@
   </ag-grid-vue>
 
   <modal :show="modal.show" @close="closeModal">
-    <component @created-item="createdItem" @updated-item="updatedItem" @close="closeModal" @cancel="closeModal" :data="modal.data" :is="modal.component"></component>
+    <component
+    @created-item="createdItem"
+    @updated-item="updatedItem"
+    @confirm="deleteItem"
+    @close="closeModal"
+    :data="modal.data"
+    :is="modal.component">
+    </component>
   </modal>
 </template>
 <script>
@@ -35,10 +42,12 @@
   import Modal from "../components/overlays/Modal.vue";
   import ItemForm from "../components/forms/ItemForm.vue";
   import SuccessMessage from "../components/messages/SuccessMessage.vue";
+  import DeleteDialog from "../components/messages/DeleteDialog.vue";
 
   export default {
     name: 'Items',
     components: {
+      DeleteDialog,
       AgGridVue,
       Modal,
       ItemForm,
@@ -116,6 +125,12 @@
               this.modal.component = 'item-form';
               this.modal.data = params.data;
               break;
+
+            case 'delete-item':
+              this.modal.show = true;
+              this.modal.component = 'delete-dialog';
+              this.modal.data = { message: `You are about to delete the item "${params.data.title}"` };
+              break;
           }
         }
       },
@@ -155,6 +170,16 @@
         this.grid_api.applyTransaction({ update: [item] });
         this.modal.component = 'success-message';
         this.modal.data = { message: `${item.title} has been updated.` };
+      },
+      deleteItem() {
+        const data = this.grid_api.getSelectedRows()[0];
+
+        this.axios.delete(`${import.meta.env.VITE_API_URL}/api/items/${data.id}`)
+        .then(() => {
+          this.grid_api.applyTransaction({ remove: [{ id: data.id }] });
+          this.modal.component = 'success-message';
+          this.modal.data = { message: `${data.title} has been deleted.` };
+        });
       },
     },
     watch: {
