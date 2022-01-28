@@ -16,12 +16,19 @@
   :getRowNodeId="getRowNodeId"
   :pagination="true"
   :paginationPageSize="25"
-  class="ag-theme-alpine w-full h-5/6"
+  class="ag-theme-alpine w-full h-full"
   >
   </ag-grid-vue>
 
   <modal :show="modal.show" @close="closeModal">
-    <component @created-office="createdOffice" @updated-office="updatedOffice" @close="closeModal" @cancel="closeModal" :data="modal.data" :is="modal.component"></component>
+    <component
+    @created-office="createdOffice"
+    @updated-office="updatedOffice"
+    @confirm="deleteOffice"
+    @close="closeModal"
+    :data="modal.data"
+    :is="modal.component">
+    </component>
   </modal>
 </template>
 <script>
@@ -31,10 +38,12 @@
   import Modal from "../components/overlays/Modal.vue";
   import OfficeForm from "../components/forms/OfficeForm.vue";
   import SuccessMessage from "../components/messages/SuccessMessage.vue";
+  import DeleteDialog from "../components/messages/DeleteDialog.vue";
 
   export default {
     name: 'Offices',
     components: {
+      DeleteDialog,
       AgGridVue,
       Modal,
       OfficeForm,
@@ -53,10 +62,11 @@
         column_defs: [
           {
             headerName: '',
-            width: 40,
+            width: 70,
             lockPosition: true,
-            cellRenderer: params => '<div class="flex items-center space-x-4">'
+            cellRenderer: () => '<div class="flex items-center space-x-4">'
               + '<button type="button" class="text-gray-600 hover:text-green-600 outline-none ring-0" data-action="edit-office"><i class="fas fa-edit" title="Edit Office" data-action="edit-office"></i></button>'
+              + '<button type="button" class="text-gray-600 hover:text-red-600 outline-none ring-0" data-action="delete-office"><i class="fas fa-trash" title="Delete Office" data-action="delete-office"></i></button>'
               + '</div>',
           },
           { 
@@ -100,6 +110,12 @@
               this.modal.component = 'office-form';
               this.modal.data = params.data;
               break;
+
+            case 'delete-office':
+              this.modal.show = true;
+              this.modal.component = 'delete-dialog';
+              this.modal.data = { message: `You are about to delete the office "${params.data.name} (${params.data.short_name})"` };
+              break;
           }
         }
       },
@@ -132,6 +148,16 @@
         this.grid_api.applyTransaction({ update: [office] });
         this.modal.component = 'success-message';
         this.modal.data = { message: `${office.name} has been updated.` };
+      },
+      deleteOffice() {
+        const data = this.grid_api.getSelectedRows()[0];
+
+        this.axios.delete(`${import.meta.env.VITE_API_URL}/api/offices/${data.id}`)
+        .then(() => {
+          this.grid_api.applyTransaction({ remove: [{ id: data.id }] });
+          this.modal.component = 'success-message';
+          this.modal.data = { message: `${data.name} (${data.short_name}) has been deleted.` };
+        });
       },
     },
     watch: {
