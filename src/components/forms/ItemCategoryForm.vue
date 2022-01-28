@@ -1,24 +1,24 @@
 <template>
   <div class="w-1/3 bg-white rounded">
     <div class="flex justify-between items-center bg-green-600 p-4 rounded-t">
-      <h3 class="text-white">{{ data.id ? 'Update Permission' : 'Create Permission' }}</h3>
+      <h3 class="text-white">{{ item_category.id ? 'Update Item Category' : 'Create Item Category' }}</h3>
       <button type="button" @click="$emit('close')"><i class="fas fa-times text-white hover:text-gray-200" title="Close"></i></button>
     </div>
     <form>
       <div class="flex flex-col space-y-4 p-8">
         <div class="flex flex-col">
           <label class="text-sm text-gray-600 font-bold uppercase">Name</label>
-          <input type="text" v-model="data.name" class="px-2 py-1 rounded border">
+          <input type="text" v-model="item_category.name" class="px-2 py-1 rounded border">
           <div v-if="errors.hasOwnProperty('name')" class="text-sm text-red-600">{{ errors.name[0] }}</div>
         </div>
 
         <div v-if="saving" class="flex flex-col items-center space-y-4">
           <div class="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-green-600"></div>
-          <p class="text-gray-600 animate-pulse">Saving Permission Information</p>
+          <p class="text-gray-600 animate-pulse">Saving Item Category Information</p>
         </div>
         <div v-else class="flex justify-end items-center space-x-4">
-          <button type="button" @click="$emit('cancel')" class="w-40 bg-gray-200 hover:bg-gray-100 px-4 py-1 rounded">Cancel</button>
-          <button type="button" @click="savePermission" class="w-40 text-white bg-green-600 hover:bg-green-500 px-4 py-1 rounded">Save</button>
+          <button type="button" @click="$emit('close')" class="w-40 bg-gray-200 hover:bg-gray-100 px-4 py-1 rounded">Cancel</button>
+          <button type="button" @click="saveItemCategory" class="w-40 text-white bg-green-600 hover:bg-green-500 px-4 py-1 rounded">Save</button>
         </div>
       </div>
     </form>
@@ -32,23 +32,24 @@
     },
     data() {
       return {
+        item_category: JSON.parse(JSON.stringify(this.data)),
         errors: {},
         saving: false,
       }
     },
     methods: {
-      savePermission() {
+      saveItemCategory() {
         this.saving = true;
         this.errors = {};
 
-        if (this.data.id) {
-          this.updatePermission();
+        if (this.item_category.id) {
+          this.updateItemCategory();
         } else {
-          this.createPermission();
+          this.createItemCategory();
         }
       },
-      async createPermission() {
-        await this.axios.post(`${import.meta.env.VITE_API_URL}/api/item_categories`, this.data)
+      async createItemCategory() {
+        await this.axios.post(`${import.meta.env.VITE_API_URL}/api/item_categories`, this.item_category)
             .then(response => this.$emit('createdItemCategory', response.data))
             .catch(error => {
               const errors = error.response.data;
@@ -60,8 +61,8 @@
 
         this.saving = false;
       },
-      async updatePermission() {
-        await this.axios.put(`${import.meta.env.VITE_API_URL}/api/permissions/${this.data.id}`, this.data)
+      async updateItemCategory() {
+        await this.axios.put(`${import.meta.env.VITE_API_URL}/api/item_categories/${this.item_category.id}`, this.item_category)
             .then(response => this.$emit('updatedItemCategory', response.data))
             .catch(error => {
               const errors = error.response.data;

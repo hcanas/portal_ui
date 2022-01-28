@@ -20,7 +20,14 @@
   </ag-grid-vue>
 
   <modal :show="modal.show" @close="closeModal">
-    <component @created-item-category="createdItemCategory" @updated-item-category="updatedItemCategory" @close="closeModal" @cancel="closeModal" :data="modal.data" :is="modal.component"></component>
+    <component
+    @created-item-category="createdItemCategory"
+    @updated-item-category="updatedItemCategory"
+    @confirm="deleteItemCategory"
+    @close="closeModal"
+    :data="modal.data"
+    :is="modal.component">
+    </component>
   </modal>
 </template>
 <script>
@@ -30,10 +37,12 @@
   import Modal from "../components/overlays/Modal.vue";
   import ItemCategoryForm from "../components/forms/ItemCategoryForm.vue";
   import SuccessMessage from "../components/messages/SuccessMessage.vue";
+  import DeleteDialog from "../components/messages/DeleteDialog.vue";
 
   export default {
     name: 'ItemCategories',
     components: {
+      DeleteDialog,
       AgGridVue,
       Modal,
       ItemCategoryForm,
@@ -54,7 +63,7 @@
             headerName: '',
             width: 70,
             lockPosition: true,
-            cellRenderer: params => '<div class="flex items-center space-x-4">'
+            cellRenderer: () => '<div class="flex items-center space-x-4">'
               + '<button type="button" class="text-gray-600 hover:text-green-600 outline-none ring-0" data-action="edit-item-category"><i class="fas fa-edit" title="Edit Item Category" data-action="edit-item-category"></i></button>'
               + '<button type="button" class="text-gray-600 hover:text-red-600 outline-none ring-0" data-action="delete-item-category"><i class="fas fa-trash" title="Delete Item Category" data-action="delete-item-category"></i></button>'
               + '</div>',
@@ -72,7 +81,7 @@
     created() {
       this.axios.get(`${import.meta.env.VITE_API_URL}/api/item_categories`)
       .then(response => this.item_categories = response.data)
-      .catch(error => this.item_categories = []);
+      .catch(() => this.item_categories = []);
     },
     methods: {
       gridReady(params) {
@@ -85,6 +94,12 @@
               this.modal.show = true;
               this.modal.component = 'item-category-form';
               this.modal.data = params.data;
+              break;
+
+            case 'delete-item-category':
+              this.modal.show = true;
+              this.modal.component = 'delete-dialog';
+              this.modal.data = { message: `You are about to delete the item category "${params.data.name}"`};
               break;
           }
         }
@@ -114,6 +129,16 @@
         this.grid_api.applyTransaction({ update: [item_category] });
         this.modal.component = 'success-message';
         this.modal.data = { message: `${item_category.name} has been updated.` };
+      },
+      deleteItemCategory() {
+        const data = this.grid_api.getSelectedRows()[0];
+
+        this.axios.delete(`${import.meta.env.VITE_API_URL}/api/item_categories/${data.id}`)
+        .then(() => {
+          this.grid_api.applyTransaction({ remove: [{ id: data.id }] });
+          this.modal.component = 'success-message';
+          this.modal.data = { message: `${data.name} has been deleted.` };
+        });
       },
     },
     watch: {
