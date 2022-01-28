@@ -16,12 +16,19 @@
     :getRowNodeId="getRowNodeId"
     :pagination="true"
     :paginationPageSize="25"
-    class="ag-theme-alpine w-full h-5/6"
+    class="ag-theme-alpine w-full h-full"
   >
   </ag-grid-vue>
 
   <modal :show="modal.show" @close="closeModal">
-    <component @created-permission="createdPermission" @updated-permission="updatedPermission" @close="closeModal" @cancel="closeModal" :data="modal.data" :is="modal.component"></component>
+    <component
+    @created-permission="createdPermission"
+    @updated-permission="updatedPermission"
+    @confirm="deletePermission"
+    @close="closeModal"
+    :data="modal.data"
+    :is="modal.component">
+    </component>
   </modal>
 </template>
 <script>
@@ -31,10 +38,12 @@
   import Modal from "../components/overlays/Modal.vue";
   import PermissionForm from "../components/forms/PermissionForm.vue";
   import SuccessMessage from "../components/messages/SuccessMessage.vue";
+  import DeleteDialog from "../components/messages/DeleteDialog.vue";
 
   export default {
     name: 'Permissions',
     components: {
+      DeleteDialog,
       AgGridVue,
       Modal,
       PermissionForm,
@@ -73,7 +82,7 @@
     created() {
       this.axios.get(`${import.meta.env.VITE_API_URL}/api/permissions`)
       .then(response => this.permissions = response.data)
-      .catch(error => this.permissions = []);
+      .catch(() => this.permissions = []);
     },
     methods: {
       gridReady(params) {
@@ -87,6 +96,11 @@
               this.modal.component = 'permission-form';
               this.modal.data = params.data;
               break;
+
+            case 'delete-permission':
+              this.modal.show = true;
+              this.modal.component = 'delete-dialog';
+              this.modal.data = { message: `You are about to delete the permission "${params.data.name}"` };
           }
         }
       },
@@ -115,6 +129,16 @@
         this.grid_api.applyTransaction({ update: [permission] });
         this.modal.component = 'success-message';
         this.modal.data = { message: `${permission.name} has been updated.` };
+      },
+      deletePermission() {
+        const data = this.grid_api.getSelectedRows()[0];
+
+        this.axios.delete(`${import.meta.env.VITE_API_URL}/api/permissions/${data.id}`)
+        .then(() => {
+          this.grid_api.applyTransaction({ remove: [{ id: data.id }] });
+          this.modal.component = 'success-message';
+          this.modal.data = { message: `${data.name} has been deleted.` };
+        });
       },
     },
     watch: {
