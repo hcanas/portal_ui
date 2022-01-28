@@ -20,7 +20,7 @@
   :getRowNodeId="getRowNodeId"
   :pagination="true"
   :paginationPageSize="25"
-  class="ag-theme-alpine w-full h-5/6"
+  class="ag-theme-alpine w-full h-full"
   >
   </ag-grid-vue>
 
