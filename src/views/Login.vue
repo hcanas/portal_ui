@@ -1,6 +1,6 @@
 <template>
   <div class="w-full h-full flex justify-center items-center bg-gray-100">
-    <div class="w-96 flex flex-col space-y-12 p-8 bg-white shadow-lg rounded">
+    <div class="w-1/3 flex flex-col space-y-12 p-24 bg-white shadow-lg rounded">
       <h1 class="flex justify-center items-center">
         <span class="text-5xl text-gray-600 font-bold">P</span>
         <img src="/images/DOH-Logo.png" class="w-9">
@@ -36,6 +36,8 @@
   </div>
 </template>
 <script>
+  import * as Cookies from 'js-cookie';
+
   export default {
     name: 'Login',
     data() {
@@ -53,17 +55,14 @@
         this.logging_in = true;
         this.login_status = '';
 
-        this.axios.get(`${import.meta.env.VITE_API_URL}/sanctum/csrf-cookie`)
+        this.axios.post(`${import.meta.env.VITE_API_URL}/api/auth`, this.credentials)
         .then(response => {
-          this.axios.post(`${import.meta.env.VITE_API_URL}/api/auth`, this.credentials)
-          .then(response => {
-            this.$store.dispatch('setUser', response.data);
-            this.$router.push('/');
-          })
-          .catch(error => {
-            this.logging_in = false;
-            this.login_status = 'failed';
-          });
+          Cookies.set('auth_token', response.data, { expires: 1/12 });
+          this.$router.push('/');
+        })
+        .catch(() => {
+          this.logging_in = false;
+          this.login_status = 'failed';
         });
       },
     },

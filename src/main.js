@@ -6,9 +6,10 @@ import VCalendar from 'v-calendar';
 import VueAxios from 'vue-axios';
 import axios from 'axios';
 import './style.css';
+import * as Cookies from "js-cookie";
 
 axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
-axios.defaults.withCredentials = true;
+axios.defaults.headers.common['Authorization'] = `Bearer ${Cookies.get('auth_token') ?? null}`;
 
 createApp(App)
   .use(router)

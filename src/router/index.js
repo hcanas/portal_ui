@@ -1,10 +1,11 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import Home from '../views/Home.vue';
 import store from '../store/index.js';
+import * as Cookies from 'js-cookie';
 import axios from 'axios';
 
 axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
-axios.defaults.withCredentials = true;
+axios.defaults.headers.common['Authorization'] = `Bearer ${Cookies.get('auth_token') ?? null}`;
 
 const routes = [
   {
@@ -84,16 +85,16 @@ const router = createRouter({
 });
 
 router.beforeEach((to, from) => {
-  if (to.meta.requiresAuth && store.getters['getUser'] === null) {
+  if (to.meta.requiresAuth && Cookies.get('auth_token') === null) {
     return '/login';
-  } else if (to.meta.requiresAuth && store.getters['getUser']) {
-    axios.get(`${import.meta.env.VITE_API_URL}/api/auth/${store.getters['getUser']['id']}`)
+  } else if (to.meta.requiresAuth && Cookies.get('auth_token')) {
+    axios.get(`${import.meta.env.VITE_API_URL}/api/auth/${Cookies.get('auth_token')}`)
     .then(response => {
       store.commit('setUser', response.data);
     })
     .catch(error => {
       store.commit('setUser', null);
-      window.location = 'http://localhost:3000/login';
+      window.location = `${import.meta.env.VITE_DOMAIN}/login`;
     });
   }
 });
