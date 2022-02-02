@@ -5,7 +5,6 @@ import * as Cookies from 'js-cookie';
 import axios from 'axios';
 
 axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
-axios.defaults.headers.common['Authorization'] = `Bearer ${Cookies.get('auth_token') ?? null}`;
 
 const routes = [
   {
@@ -85,10 +84,14 @@ const router = createRouter({
 });
 
 router.beforeEach((to, from) => {
-  if (to.meta.requiresAuth && Cookies.get('auth_token') === null) {
+  if (to.meta.requiresAuth && Cookies.get('auth_token') === undefined) {
+    store.commit('setUser', null);
     return '/login';
   } else if (to.meta.requiresAuth && Cookies.get('auth_token')) {
-    axios.get(`${import.meta.env.VITE_API_URL}/api/auth/${Cookies.get('auth_token')}`)
+    axios.defaults.headers.common['Authorization'] = `Bearer ${Cookies.get('auth_token')}`;
+    const permissions = ['user_account', 'time_attendance'];
+
+    axios.get(`${import.meta.env.VITE_API_URL}/api/auth/${Cookies.get('auth_token')}?permissions=${permissions.join(',')}`)
     .then(response => {
       store.commit('setUser', response.data);
     })
