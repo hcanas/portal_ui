@@ -7,6 +7,7 @@
     "serve": "vite preview"
   },
   "dependencies": {
+    "@popperjs/core": "^2.11.2",
     "ag-grid-community": "^26.2.0",
     "ag-grid-vue3": "^26.2.0",
     "axios": "^0.24.0",
