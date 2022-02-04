@@ -61,6 +61,7 @@
             headerName: 'Name',
             field: 'name',
             resizable: true,
+            sortable: true,
             flex: 1,
             cellRenderer: params => {
               return `<span class="w-full h-full items-center">${params.data.name}</span>`;
@@ -68,6 +69,7 @@
           },
           {
             headerName: 'Permissions',
+            resizable: true,
             flex: 2,
             autoHeight: true,
             cellRenderer: params => {
