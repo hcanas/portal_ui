@@ -1,18 +1,10 @@
 <template>
   <div class="w-2/3 h-full flex flex-col bg-white rounded">
-    <div class="flex-shrink-0 flex justify-between items-center bg-green-600 p-4 rounded-t">
-      <h3 class="text-white">Manage Roles - {{ user.username }}</h3>
-      <button type="button" @click="$emit('close')"><i class="fas fa-times text-white hover:text-gray-200" title="Close"></i></button>
+    <div class="flex justify-between items-center px-12 py-6 border-b rounded-t">
+      <h3 class="text-2xl text-gray-600 uppercase font-bold">Manage Roles - {{ user.username }}</h3>
+      <button type="button" @click="$emit('close')"><i class="fas fa-times text-gray-300 hover:text-gray-600" title="Close"></i></button>
     </div>
-    <div class="flex-grow flex flex-col space-y-4 p-8 overflow-y-auto">
-      <div class="flex justify-between items-center">
-        <div class="text-xs font-bold uppercase text-gray-600">{{ selected_row_count }} item(s) selected</div>
-        <div class="flex items-center space-x-4">
-          <input type="text" v-model="filter_text" placeholder="Search keyword..." class="text-sm px-2 py-1 border rounded">
-          <button type="button" @click="save" class="w-40 text-white bg-green-600 hover:bg-green-500 px-2 py-1 rounded">Save</button>
-        </div>
-      </div>
-
+    <div class="flex-grow flex flex-col space-y-4 px-12 py-8 overflow-y-auto">
       <ag-grid-vue
         @grid-ready="gridReady"
         @first-data-rendered="dataRendered"
@@ -25,8 +17,12 @@
         :pagination="true"
         :paginationPageSize="25"
         class="ag-theme-alpine w-full h-full"
-      >
-      </ag-grid-vue>
+      />
+      
+      <div class="flex justify-between">
+        <button type="button" @click="$emit('cancel')" class="w-40 bg-gray-200 hover:bg-gray-100 px-4 py-1 rounded">Cancel</button>
+        <button type="button" @click="save" class="w-40 text-white bg-green-600 hover:bg-green-500 px-4 py-1 rounded">Save</button>
+      </div>
     </div>
   </div>
 </template>
@@ -60,17 +56,21 @@
           {
             headerName: 'Name',
             field: 'name',
-            resizable: true,
             sortable: true,
-            flex: 1,
+            filter: true,
+            width: 400,
+            wrapText: true,
+            autoHeight: true,
             cellRenderer: params => {
               return `<span class="w-full h-full items-center">${params.data.name}</span>`;
             },
           },
           {
             headerName: 'Permissions',
-            resizable: true,
-            flex: 2,
+            sortable: true,
+            filter: true,
+            width: 710,
+            wrapText: true,
             autoHeight: true,
             cellRenderer: params => {
               let permissions = '<div class="w-full flex flex-wrap">';
@@ -95,7 +95,7 @@
 
               return permissions;
             },
-            getQuickFilterText: params => {
+            valueGetter: params => {
               let permissions = '';
 
               Object.values(params.data.role_permissions).forEach(role_permission => {

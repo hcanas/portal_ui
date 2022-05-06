@@ -8,18 +8,17 @@
   </div>
 
   <ag-grid-vue v-if="offices.length > 0"
-  @grid-ready="gridReady"
-  @cell-clicked="cellClicked"
-  :columnDefs="column_defs"
-  :rowData="offices"
-  :rowSelection="'single'"
-  :getRowNodeId="getRowNodeId"
-  :pagination="true"
-  :paginationPageSize="25"
-  class="ag-theme-alpine w-full h-full"
-  >
-  </ag-grid-vue>
-
+    @grid-ready="gridReady"
+    @cell-clicked="cellClicked"
+    :columnDefs="column_defs"
+    :rowData="offices"
+    :rowSelection="'single'"
+    :getRowNodeId="getRowNodeId"
+    :pagination="true"
+    :paginationPageSize="25"
+    class="ag-theme-alpine w-full h-full"
+  />
+  
   <modal :show="modal.show" @close="closeModal">
     <component
     @created-office="createdOffice"
@@ -73,22 +72,18 @@
             headerName: 'Name', 
             field: 'name',
             sortable: true,
-            resizable: true, 
-            flex: 2, 
-          },
-          { 
-            headerName: 'Short Name', 
-            field: 'short_name', 
-            sortable: true,
-            resizable: true, 
-            flex: 1,
+            width: 726,
+            wrapText: true,
+            autoHeight: true,
+            valueGetter: params => params.data.name + ' (' + params.data.short_name + ')',
           },
           {
             headerName: 'Parent Office',
             field: 'parent_office.name',
             sortable: true,
-            resizable: true, 
-            flex: 2,
+            width: 727,
+            wrapText: true,
+            autoHeight: true,
           },
         ],
       }

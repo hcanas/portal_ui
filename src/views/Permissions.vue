@@ -17,8 +17,7 @@
     :pagination="true"
     :paginationPageSize="25"
     class="ag-theme-alpine w-full h-full"
-  >
-  </ag-grid-vue>
+  />
 
   <modal :show="modal.show" @close="closeModal">
     <component
@@ -73,8 +72,7 @@
             headerName: 'Name', 
             field: 'name',
             sortable: true,
-            resizable: true, 
-            flex: 1, 
+            width: 1453,
           },
         ],
       }

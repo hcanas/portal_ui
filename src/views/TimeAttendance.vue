@@ -7,17 +7,16 @@
   </div>
 
   <ag-grid-vue v-if="employees.length > 0"
-  @grid-ready="gridReady"
-  @selection-changed="selectionChanged"
-  :columnDefs="column_defs"
-  :rowData="employees"
-  :rowSelection="'single'"
-  :getRowNodeId="getRowNodeId"
-  :pagination="true"
-  :paginationPageSize="25"
-  class="ag-theme-alpine w-full h-1/2 mb-12"
-  >
-  </ag-grid-vue>
+    @grid-ready="gridReady"
+    @selection-changed="selectionChanged"
+    :columnDefs="column_defs"
+    :rowData="employees"
+    :rowSelection="'single'"
+    :getRowNodeId="getRowNodeId"
+    :pagination="true"
+    :paginationPageSize="25"
+    class="flex-shrink-0 ag-theme-alpine w-full h-96 mb-12"
+  />
 
   <h1 class="text-gray-700 text-xl font-medium mb-4">Time Attendance {{ employee ? `- ${employee.name}` : '' }}</h1>
 
@@ -65,19 +64,19 @@
             headerName: 'Name',
             field: 'name',
             sortable: true,
-            flex: 1,
+            width: 1113,
           },
           {
             headerName: 'Position',
             field: 'title',
             sortable: true,
-            flex: 1,
+            width: 200,
           },
           {
             headerName: 'Department',
             field: 'deptname',
             sortable: true,
-            flex: 1,
+            width: 200,
           },
         ],
         filter_text: '',

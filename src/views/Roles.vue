@@ -8,17 +8,16 @@
   </div>
 
   <ag-grid-vue v-if="roles.length > 0"
-  @grid-ready="gridReady"
-  @cell-clicked="cellClicked"
-  :columnDefs="column_defs"
-  :rowData="roles"
-  :rowSelection="'single'"
-  :getRowNodeId="getRowNodeId"
-  :pagination="true"
-  :paginationPageSize="25"
-  class="ag-theme-alpine w-full h-full"
-  >
-  </ag-grid-vue>
+    @grid-ready="gridReady"
+    @cell-clicked="cellClicked"
+    :columnDefs="column_defs"
+    :rowData="roles"
+    :rowSelection="'single'"
+    :getRowNodeId="getRowNodeId"
+    :pagination="true"
+    :paginationPageSize="25"
+    class="ag-theme-alpine w-full h-full"
+  />
 
   <modal :show="modal.show" @close="closeModal">
     <component
@@ -77,14 +76,14 @@
             headerName: 'Name',
             field: 'name',
             sortable: true,
-            resizable: true,
-            flex: 1,
+            width: 400,
+            wrapText: true,
+            autoHeight: true,
           },
           {
             headerName: 'Permissions',
             sortable: true,
-            resizable: true,
-            flex: 2,
+            width: 1013,
             autoHeight: true,
             cellRenderer: params => {
               if (!params.data.role_permissions) {

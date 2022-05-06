@@ -1,11 +1,11 @@
 <template>
   <div class="w-5/6 h-full flex flex-col bg-white rounded">
-    <div class="flex justify-between items-center bg-green-600 p-4 rounded-t">
-      <h3 class="text-white">Manage Permissions - {{ data.name }}</h3>
-      <button type="button" @click="$emit('close')"><i class="fas fa-times text-white hover:text-gray-200" title="Close"></i></button>
+    <div class="flex justify-between items-center px-12 py-6 border-b rounded-t">
+      <h3 class="text-2xl text-gray-600 uppercase font-bold">Manage Permissions - {{ data.name }}</h3>
+      <button type="button" @click="$emit('close')"><i class="fas fa-times text-gray-300 hover:text-gray-600" title="Close"></i></button>
     </div>
     <div class="flex-grow flex">
-      <div class="flex-grow w-2/3 px-8 pt-8">
+      <div class="flex-grow w-2/3 px-12 pt-8">
         <ag-grid-vue
         @grid-ready="permissionGridReady"
         @first-data-rendered="permissionDataRendered"
@@ -18,11 +18,10 @@
         :pagination="true"
         :paginationPageSize="25"
         class="ag-theme-alpine w-full h-full"
-        >
-        </ag-grid-vue>
+        />
       </div>
-      <div :class="{ 'w-1/3 pr-8 pt-8': offices.show }" class="flex-shrink-0 transition">
-        <ag-grid-vue v-show="offices.show"
+      <div class="flex-shrink-0 w-1/3 pr-8 pt-8">
+        <ag-grid-vue
         @grid-ready="officeGridReady"
         @selection-changed="officeSelectionChanged"
         :columnDefs="offices.column_defs"
@@ -31,17 +30,16 @@
         :suppressRowClickSelection="true"
         :getRowNodeId="getRowNodeId"
         class="ag-theme-alpine w-full h-full"
-        >
-        </ag-grid-vue>
+        />
       </div>
     </div>
-    <form>
-      <div class="flex flex-col space-y-4 p-8">
+    <form @submit.prevent>
+      <div class="flex flex-col space-y-4 px-12 py-8">
         <div v-if="saving" class="flex flex-col items-center space-y-4">
           <div class="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-green-600"></div>
           <p class="text-gray-600 animate-pulse">Saving Permissions</p>
         </div>
-        <div v-else class="flex justify-end items-center space-x-4">
+        <div v-else class="flex justify-between items-center">
           <button type="button" @click="$emit('close')" class="w-40 bg-gray-200 hover:bg-gray-100 px-4 py-1 rounded">Cancel</button>
           <button type="button" @click="savePermissions" class="w-40 text-white bg-green-600 hover:bg-green-500 px-4 py-1 rounded">Save</button>
         </div>
@@ -75,21 +73,22 @@
               suppressSizeToFit: true,
               lockPosition: true,
               cellRenderer: () => '<div class="flex items-center space-x-4">'
-                  + '<button type="button" class="text-gray-600 hover:text-green-600 outline-none ring-0" data-action="manage-offices"><i class="fas fa-building" title="Manage Offices" data-action="manage-offices"></i></button>'
-                  + '</div>',
+                + '<button type="button" class="text-gray-600 hover:text-green-600 outline-none ring-0" data-action="manage-offices"><i class="fas fa-building" title="Manage Offices" data-action="manage-offices"></i></button>'
+                + '</div>',
             },
             {
               headerName: 'Permissions',
               sortable: true,
-              resizable: true,
-              flex: 1,
+              filter: true,
+              width: 300,
               valueGetter: params => params.data.name,
             },
             {
               headerName: 'Offices',
               sortable: true,
-              resizable: true,
-              flex: 3,
+              filter: true,
+              width: 560,
+              wrapText: true,
               autoHeight: true,
               cellRenderer: params => {
                 if (!params.data.offices) {
@@ -104,17 +103,17 @@
 
                 return col += '</div>';
               },
-              getQuickFilterText: params => {
+              valueGetter: params => {
                 if (!params.data.offices) {
                   return '';
                 }
-
+  
                 let col = '';
-
+  
                 params.data.offices.forEach(office => {
                   col += `${office.name} (${office.short_name}), `
                 });
-
+  
                 return col.substr(0, col.length - 2);
               },
             },
@@ -122,7 +121,6 @@
           row_data: [],
         },
         offices: {
-          show: false,
           permission_id: null,
           grid_api: null,
           column_defs: [
@@ -135,8 +133,9 @@
             {
               headerName: 'Offices',
               sortable: true,
-              resizable: true,
-              flex: 1,
+              filter: true,
+              width: 439,
+              valueGetter: params => `${params.data.name} (${params.data.short_name})`,
               valueFormatter: params => `${params.data.name} (${params.data.short_name})`,
             },
           ],
@@ -188,7 +187,6 @@
         if (params.event.target.dataset.action) {
           switch (params.event.target.dataset.action) {
             case 'manage-offices':
-              this.offices.show = true;
               this.offices.permission_id = params.data.id;
               this.offices.column_defs[1].headerName = `Offices - ${params.data.name}`;
               this.offices.grid_api.deselectAll();

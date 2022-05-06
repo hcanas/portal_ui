@@ -12,17 +12,16 @@
   </div>
 
   <ag-grid-vue v-if="items.length > 0"
-  @grid-ready="gridReady"
-  @cell-clicked="cellClicked"
-  :columnDefs="column_defs"
-  :rowData="items"
-  :rowSelection="'single'"
-  :getRowNodeId="getRowNodeId"
-  :pagination="true"
-  :paginationPageSize="25"
-  class="ag-theme-alpine w-full h-full"
-  >
-  </ag-grid-vue>
+    @grid-ready="gridReady"
+    @cell-clicked="cellClicked"
+    :columnDefs="column_defs"
+    :rowData="items"
+    :rowSelection="'single'"
+    :getRowNodeId="getRowNodeId"
+    :pagination="true"
+    :paginationPageSize="25"
+    class="ag-theme-alpine w-full h-full"
+  />
 
   <modal :show="modal.show" @close="closeModal">
     <component
@@ -83,29 +82,31 @@
             headerName: 'Title',
             field: 'title',
             sortable: true,
-            resizable: true,
-            flex: 2,
+            width: 300,
+            wrapText: true,
+            autoHeight: true,
           },
           {
             headerName: 'Category',
             field: 'item_category.name',
             sortable: true,
-            resizable: true,
-            flex: 2,
+            width: 300,
+            wrapText: true,
+            autoHeight: true,
           },
           {
             headerName: 'Commodity Type',
             field: 'commodity_type',
             sortable: true,
-            resizable: true,
-            flex: 2,
+            width: 150,
           },
           {
             headerName: 'Details',
             field: 'details',
             sortable: true,
-            resizable: true,
-            flex: 4,
+            width: 633,
+            wrapText: true,
+            autoHeight: true,
           },
         ],
       }
@@ -149,7 +150,7 @@
           year: null,
           title: null,
           category_id: null,
-          commodity_type: 'expendables',
+          commodity_type: 'Expendables',
           details: null,
         };
       },

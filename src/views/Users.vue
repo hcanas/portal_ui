@@ -8,17 +8,16 @@
   </div>
 
   <ag-grid-vue v-if="users.length > 0"
-  @grid-ready="gridReady"
-  @cell-clicked="cellClicked"
-  :columnDefs="column_defs"
-  :rowData="users"
-  :rowSelection="'single'"
-  :getRowNodeId="getRowNodeId"
-  :pagination="true"
-  :paginationPageSize="25"
-  class="ag-theme-alpine w-full h-full"
-  >
-  </ag-grid-vue>
+    @grid-ready="gridReady"
+    @cell-clicked="cellClicked"
+    :columnDefs="column_defs"
+    :rowData="users"
+    :rowSelection="'single'"
+    :getRowNodeId="getRowNodeId"
+    :pagination="true"
+    :paginationPageSize="25"
+    class="ag-theme-alpine w-full h-full"
+  />
 
   <modal :show="modal.show" @close="closeModal">
     <component @created-user="createdUser" @updated-user="updatedUser" @updated-roles="updatedRoles" @close="closeModal" @cancel="closeModal" :user="modal.data" :is="modal.component"></component>
@@ -69,8 +68,9 @@
           { 
             headerName: 'Name',
             sortable: true,
-            resizable: true, 
-            flex: 1, 
+            width: 400,
+            wrapText: true,
+            autoHeight: true,
             valueGetter: params => !params.data
               ? ''
               : params.data.last_name + ', ' 
@@ -82,15 +82,14 @@
             headerName: 'Username', 
             field: 'username', 
             sortable: true,
-            resizable: true, 
-            flex: 1,
+            width: 300,
           },
           {
             headerName: 'Roles',
             field: 'roles',
             sortable: true,
-            resizable: true,
-            flex: 2,
+            width: 753,
+            wrapText: true,
             autoHeight: true,
             cellRenderer: params => {
               if (!params.data.roles) {

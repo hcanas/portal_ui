@@ -9,12 +9,7 @@
 
       <div class="flex flex-col mb-4 py-4">
         <p class="text-gray-200">Hello,</p>
-        <p class="text-gray-200">{{ user.last_name + ', ' + user.given_name + ' ' + user.middle_name ?? '' + ' ' + user.name_suffix }}</p>
-        <p class="flex flex-wrap">
-          <span v-for="role in user.roles" :key="role.id" class="text-sm bg-gray-100 m-0.5 px-2 py-0.5 rounded-full">
-            {{ role.name }}
-          </span>
-        </p>
+        <p class="text-gray-200">{{ user.last_name + ', ' + user.given_name + ' ' + (user.middle_name ?? '') + ' ' + (user.name_suffix ?? '') }}</p>
       </div>
 
       <div class="flex flex-col space-y-4">

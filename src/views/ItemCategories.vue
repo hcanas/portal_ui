@@ -7,17 +7,16 @@
     </div>
   </div>
   <ag-grid-vue v-if="item_categories.length > 0"
-  @grid-ready="gridReady"
-  @cell-clicked="cellClicked"
-  :columnDefs="column_defs"
-  :rowData="item_categories"
-  :rowSelection="'single'"
-  :getRowNodeId="getRowNodeId"
-  :pagination="true"
-  :paginationPageSize="25"
-  class="ag-theme-alpine w-full h-full"
-  >
-  </ag-grid-vue>
+    @grid-ready="gridReady"
+    @cell-clicked="cellClicked"
+    :columnDefs="column_defs"
+    :rowData="item_categories"
+    :rowSelection="'single'"
+    :getRowNodeId="getRowNodeId"
+    :pagination="true"
+    :paginationPageSize="25"
+    class="ag-theme-alpine w-full h-full"
+  />
 
   <modal :show="modal.show" @close="closeModal">
     <component
@@ -72,8 +71,9 @@
             headerName: 'Name',
             field: 'name',
             sortable: true,
-            resizable: true,
-            flex: 1,
+            width: 1453,
+            wrapText: true,
+            autoHeight: true,
           },
         ],
       }

@@ -34,7 +34,7 @@
         <h3 class="text-lg font-medium px-4">Systems</h3>
       </div>
       <div class="flex-grow flex items-start flex-wrap">
-        <a href="#" class="text-white font-medium bg-green-600 hover:bg-green-500 focus:bg-green-500 p-4 m-4 rounded">FMTIS</a>
+        <a href="http://localhost:3001" class="text-white font-medium bg-green-600 hover:bg-green-500 focus:bg-green-500 p-4 m-4 rounded">FMTIS</a>
       </div>
     </div>
   </div>
@@ -47,8 +47,7 @@
     @updated-announcement="updatedAnnouncement"
     @confirm="deleteAnnouncement"
     :data="modal.data"
-    >
-    </component>
+    />
   </modal>
 </template>
 <script>
